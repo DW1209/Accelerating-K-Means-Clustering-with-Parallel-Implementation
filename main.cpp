@@ -1,6 +1,8 @@
 #include <time.h>
+#include <math.h>
 #include <getopt.h>
 #include <iostream>
+#include <algorithm>
 #include "kmeans.h"
 
 void usage(const char *progname) {
@@ -43,14 +45,32 @@ int main(int argc, char *argv[]) {
     DataFrame points;
     readfile(filename, points);
 
+    double elapsed;
     struct timespec starttime, endtime;
-    clock_gettime(CLOCK_MONOTONIC, &starttime);
-    kmeans(points, clusters, num_of_iterations);
-    clock_gettime(CLOCK_MONOTONIC, &endtime);
+    std::vector<double> elapsed_times;
 
-    double duration = endtime.tv_sec - starttime.tv_sec;
-    duration += (endtime.tv_nsec - starttime.tv_nsec) / 1000000000.0;
-    printf("Total Application Time: %8fs\n", duration);
+    for (int thread_nums = 1; thread_nums <= 8; thread_nums *= 2) {
+        if (thread_nums == 1) {
+            clock_gettime(CLOCK_MONOTONIC, &starttime);
+            kmeansSerial(points, clusters, num_of_iterations);
+            clock_gettime(CLOCK_MONOTONIC, &endtime);
+        } else {
+            clock_gettime(CLOCK_MONOTONIC, &starttime);
+            kmeansThread(points, clusters, num_of_iterations, thread_nums);
+            clock_gettime(CLOCK_MONOTONIC, &endtime);
+        }
+
+        elapsed = endtime.tv_sec - starttime.tv_sec;
+        elapsed += (endtime.tv_nsec - starttime.tv_nsec) / 1000000000.0;
+        elapsed_times.push_back(elapsed);
+    }
+
+    for (int i = 0; i < 4; i++) {
+        int thread_nums = (int) pow(2, i);
+        double ratio = std::min(elapsed_times[0] / elapsed_times[i], i + 1.0);
+        printf("Total elapsed time with %d thread(s): %7.3f(%2.1fX)s\n", thread_nums, elapsed_times[i], ratio);
+    }
+
     writefile(filename + ".out", points);
 
     return 0;
