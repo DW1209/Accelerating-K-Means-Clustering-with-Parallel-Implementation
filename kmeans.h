@@ -24,10 +24,11 @@ struct Point {
     }
 };
 
-double square(double value);
-double squared_euclidean_distance(Point first, Point second);
-DataFrame kmeans(DataFrame &data, size_t k, long long num_of_iterations);
 void readfile(std::string filename, DataFrame &points);
 void writefile(std::string filename, DataFrame &points);
+long double square(double value);
+long double squared_euclidean_distance(Point first, Point second);
+DataFrame kmeansSerial(DataFrame &data, size_t k, long long num_of_iterations);
+DataFrame kmeansThread(DataFrame &data, size_t k, long long num_of_iterations, int expected_thread_nums);
 
 #endif

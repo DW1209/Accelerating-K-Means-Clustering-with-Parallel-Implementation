@@ -1,5 +1,5 @@
 CXX = g++
-CFLAGS = -std=c++17 -g -Wall -O3
+CFLAGS = -std=c++17 -g -Wall -O3 -fopenmp
 
 PROGS = kmeans
 
