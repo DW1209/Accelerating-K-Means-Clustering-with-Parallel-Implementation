@@ -67,8 +67,8 @@ int main(int argc, char *argv[]) {
 
     for (int i = 0; i < 4; i++) {
         int thread_nums = (int) pow(2, i);
-        double ratio = std::min(elapsed_times[0] / elapsed_times[i], i + 1.0);
-        printf("Total elapsed time with %d thread(s): %7.3f(%2.1fX)s\n", thread_nums, elapsed_times[i], ratio);
+        double ratio = std::min(elapsed_times[0] / elapsed_times[i], (double) thread_nums);
+        printf("Total elapsed time with %d thread(s): %7.3fs (%2.1fX)\n", thread_nums, elapsed_times[i], ratio);
     }
 
     writefile(filename + ".out", points);
