@@ -12,9 +12,9 @@ if __name__ == '__main__':
 
     nums = 1000 if args.nums is None else args.nums
     maximum = 5000 if args.maximum is None else args.maximum
-    filename = 'test.txt' if args.filename is None else args.filename
+    filename = 'data.txt' if args.filename is None else args.filename
 
     with open(filename, 'w') as f:
         for i in range(nums):
-            p = (random.randint(0, maximum), random.randint(0, maximum))
-            f.write('%8d %8d\n' %p);
+            p = (random.uniform(0, maximum), random.uniform(0, maximum))
+            f.write('%10.3f %10.3f\n' %p)
