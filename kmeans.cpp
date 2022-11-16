@@ -1,5 +1,6 @@
 #include <omp.h>
 #include <random>
+#include <iomanip>
 #include <fstream>
 #include "kmeans.h"
 
@@ -27,7 +28,7 @@ void writefile(std::string filename, DataFrame &points) {
 
     if (fp.is_open()) {
         for (DataFrame::iterator it = points.begin(); it != points.end(); it++) {
-            fp << it->x << " " << it->y << " " << it->cluster << std::endl;
+            fp << std::setfill(' ') << std::setw(12) << std::setprecision(10) << it->x << std::setw(12) << std::setprecision(10) << it->y << std::setw(4) << it->cluster << std::endl;
         }
 
         fp.close();
