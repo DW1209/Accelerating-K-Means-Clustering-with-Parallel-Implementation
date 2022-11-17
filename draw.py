@@ -7,7 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Draw the scatterplots before and after K-means Clustering.')
+    parser = argparse.ArgumentParser(description='Draw the scatterplots before and after K-Means Clustering.')
     parser.add_argument('-c', '--clusters', type=int, help='number of clusters', required=True)
     parser.add_argument('-f', '--filename', type=str, help='<FILENAME> from the inputs directory', required=True)
     args, _ = parser.parse_known_args()
