@@ -1,14 +1,14 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 import os
 import random
 import argparse
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Randomly generate 2d coordinates')
-    parser.add_argument('-n', '--nums', type=int, help='total nums of points')
-    parser.add_argument('-m', '--maximum', type=int, help='2d coordinate maximum')
-    parser.add_argument('-f', '--filename', type=str, help='filename which will be stored in the inputs directory')
+    parser = argparse.ArgumentParser(description='Randomly generate 2d coordinates and store in the inputs directory.')
+    parser.add_argument('-n', '--nums', type=int, help='generate <NUMS> points')
+    parser.add_argument('-m', '--maximum', type=int, help='set the 2d coordinate to range between 0 and <MAXIMUM>')
+    parser.add_argument('-f', '--filename', type=str, help='store the data in the inputs directory and named <FILENAME>')
     args, _ = parser.parse_known_args()
 
     if os.path.exists('inputs') == False:
