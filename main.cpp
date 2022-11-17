@@ -11,7 +11,7 @@ void usage(const char *progname) {
     fprintf(stderr, "  -f --filename <FILENAME>   filename of input data\n");
     fprintf(stderr, "  -c --clusters <M>          Set M clusters\n");
     fprintf(stderr, "  -n --iterations <N>        Set N iterations\n");
-    fprintf(stderr, "  -? --help                  This message\n");
+    fprintf(stderr, "  -h --help                  This message\n");
 }
 
 int main(int argc, char *argv[]) {
@@ -29,11 +29,12 @@ int main(int argc, char *argv[]) {
     long long num_of_iterations = 0;
     bool fmark = false, cmark = false, nmark = false;
 
-    while ((opt = getopt_long(argc, argv, "f:c:n:?", long_options, NULL)) != EOF) {
+    while ((opt = getopt_long(argc, argv, "f:c:n:h", long_options, NULL)) != EOF) {
         switch (opt) {
             case 'f': filename = std::string(optarg);                fmark = true; break;
             case 'c': clusters = strtol(optarg, NULL, 10);           cmark = true; break;
             case 'n': num_of_iterations = strtoll(optarg, NULL, 10); nmark = true; break;
+            case 'h': usage(argv[0]); exit(1);
             default : usage(argv[0]); exit(1);
         }
     }
