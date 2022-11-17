@@ -2,13 +2,19 @@
 #include <random>
 #include <iomanip>
 #include <fstream>
+#include <filesystem>
+#include <sys/stat.h>
 #include "kmeans.h"
 
 #define DataFrame std::vector<Point>
 
 void readfile(std::string filename, DataFrame &points) {
+    std::filesystem::path dir("inputs");
+    std::filesystem::path file(filename);
+    std::filesystem::path pathname = dir / file;
+
     std::ifstream fp;
-    fp.open(filename.c_str(), std::ofstream::in);
+    fp.open(pathname, std::ofstream::in);
 
     if (fp.is_open()) {
         double x, y;
@@ -23,8 +29,16 @@ void readfile(std::string filename, DataFrame &points) {
 }
 
 void writefile(std::string filename, DataFrame &points) {
+    std::filesystem::path dir("outputs");
+    std::filesystem::path file(filename);
+    std::filesystem::path pathname = dir / file;
+
+    if (!std::filesystem::exists(dir)) {
+        mkdir(dir.c_str(), 0775);
+    }
+
     std::ofstream fp;
-    fp.open(filename.c_str(), std::ofstream::out);
+    fp.open(pathname, std::ofstream::out);
 
     if (fp.is_open()) {
         for (DataFrame::iterator it = points.begin(); it != points.end(); it++) {
