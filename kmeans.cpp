@@ -6,7 +6,8 @@
 #include <sys/stat.h>
 #include "kmeans.h"
 
-#define DataFrame std::vector<Point>
+#define MODE        0775
+#define DataFrame   std::vector<Point>
 
 void readfile(std::string filename, DataFrame &points) {
     std::filesystem::path dir("inputs");
@@ -34,7 +35,7 @@ void writefile(std::string filename, DataFrame &points) {
     std::filesystem::path pathname = dir / file;
 
     if (!std::filesystem::exists(dir)) {
-        mkdir(dir.c_str(), 0775);
+        mkdir(dir.c_str(), MODE);
     }
 
     std::ofstream fp;
@@ -53,11 +54,11 @@ long double square(double value) {
     return value * value;
 }
 
-long double squared_euclidean_distance(Point first, Point second) {
+long double squared_euclidean_distance(const Point &first, const Point &second) {
     return square(first.x - second.x) + square(first.y - second.y);
 }
 
-DataFrame kmeansSerial(DataFrame &data, size_t k, long long num_of_iterations) {
+DataFrame kmeansSerial(DataFrame &data, size_t k) {
     static std::random_device seed;
     static std::mt19937 random_number_generator(seed());
     std::uniform_int_distribution<long long> indices(0, data.size() - 1);
@@ -68,7 +69,9 @@ DataFrame kmeansSerial(DataFrame &data, size_t k, long long num_of_iterations) {
         means[i] = data[indices(random_number_generator)];
     }
 
-    for (long long it = 0; it < num_of_iterations; it++) {
+    bool change = false;
+
+    while (!change) {
         // Find the point belongs to which cluster
         for (long long point = 0; point < (long long) data.size(); point++) {
             long double best_distance = std::numeric_limits<double>::max();
@@ -94,6 +97,16 @@ DataFrame kmeansSerial(DataFrame &data, size_t k, long long num_of_iterations) {
             counts[cluster] += 1;
         }
 
+        change = true;
+        for (size_t cluster = 0; cluster < k; cluster++) {
+            const long long count = std::max<long long>(1, counts[cluster]);
+            const double x = new_means[cluster].x / count;
+            const double y = new_means[cluster].y / count;
+            if (means[cluster].x != x || means[cluster].y != y) {
+                change = false; break;
+            }
+        }
+
         // Divide sums by counts to get new centroids
         for (size_t cluster = 0; cluster < k; cluster++) {
             const long long count = std::max<long long>(1, counts[cluster]);
@@ -105,7 +118,7 @@ DataFrame kmeansSerial(DataFrame &data, size_t k, long long num_of_iterations) {
     return means;
 }
 
-DataFrame kmeansThread(DataFrame &data, size_t k, long long num_of_iterations, int expected_thread_nums) {
+DataFrame kmeansThread(DataFrame &data, size_t k, int expected_thread_nums) {
     static std::random_device seed;
     static std::mt19937 random_number_generator(seed());
     std::uniform_int_distribution<long long> indices(0, data.size() - 1);
@@ -116,7 +129,9 @@ DataFrame kmeansThread(DataFrame &data, size_t k, long long num_of_iterations, i
         means[i] = data[indices(random_number_generator)];
     }
 
-    for (long long it = 0; it < num_of_iterations; it++) {
+    bool change = false;
+
+    while (!change) {
         DataFrame new_means(k);
         std::vector<long long> counts(k, 0);
 
@@ -173,6 +188,19 @@ DataFrame kmeansThread(DataFrame &data, size_t k, long long num_of_iterations, i
                         new_means[cluster].x += local_new_mean[cluster].x;
                         new_means[cluster].y += local_new_mean[cluster].y;
                         counts[cluster] += local_count[cluster];
+                    }
+                }
+            }
+
+            #pragma omp single
+            {
+                change = true;
+                for (size_t cluster = 0; cluster < k; cluster++) {
+                    const long long count = std::max<long long>(1, counts[cluster]);
+                    const double x = new_means[cluster].x / count;
+                    const double y = new_means[cluster].y / count;
+                    if (means[cluster].x != x || means[cluster].y != y) {
+                        change = false; break;
                     }
                 }
             }

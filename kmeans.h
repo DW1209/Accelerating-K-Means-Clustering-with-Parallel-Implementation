@@ -27,8 +27,8 @@ struct Point {
 void readfile(std::string filename, DataFrame &points);
 void writefile(std::string filename, DataFrame &points);
 long double square(double value);
-long double squared_euclidean_distance(Point first, Point second);
-DataFrame kmeansSerial(DataFrame &data, size_t k, long long num_of_iterations);
-DataFrame kmeansThread(DataFrame &data, size_t k, long long num_of_iterations, int expected_thread_nums);
+long double squared_euclidean_distance(const Point &first, const Point &second);
+DataFrame kmeansSerial(DataFrame &data, size_t k);
+DataFrame kmeansThread(DataFrame &data, size_t k, int expected_thread_nums);
 
 #endif
