@@ -14,8 +14,8 @@ if __name__ == '__main__':
     if os.path.exists('inputs') == False:
         os.mkdir('inputs')
 
-    nums = 1000 if args.nums is None else args.nums
-    maximum = 5000 if args.maximum is None else args.maximum
+    nums = 10000 if args.nums is None else args.nums
+    maximum = 1000000 if args.maximum is None else args.maximum
     filename = os.path.join('inputs', 'data.txt' if args.filename is None else args.filename)
 
     with open(filename, 'w') as f:
