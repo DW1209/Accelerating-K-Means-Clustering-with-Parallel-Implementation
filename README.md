@@ -1,7 +1,7 @@
-# K-means Clustering using OpenMP
+# K-Means Clustering using OpenMP
 
 ## Description
-- **generate.py**: default NUMS = 1000, MAXIMUM = 5000, FILENAME = 'data.txt' 
+- **generate.py**: default NUMS = 10000, MAXIMUM = 1000000, FILENAME = 'data.txt' 
 ```console
 usage: generate.py [-h] [-n NUMS] [-m MAXIMUM] [-f FILENAME]
 
@@ -14,26 +14,25 @@ optional arguments:
   -f FILENAME, --filename FILENAME  store the data in the inputs directory and named <FILENAME>
 ```
 
-- **kmeans**: default N = 1000
+- **kmeans**: default CLUSTERS = 3, FILENAME = 'data.txt'
 ```console
-usage: ./kmeans [-h] [-n N] -f FILENAME -c M
+usage: ./kmeans [-h] [-c CLUSTERS] [-f FILENAME]
 
 optional arguments:
   -h --help                     show this help message and exit
+  -c --clusters <CLUSTERS>      classify the data into <CLUSTERS> groups
   -f --filename <FILENAME>      <FILENAME> in the inputs directory
-  -c --clusters <M>             set <M> clusters
-  -n --iterations <N>           set <N> iterations
 ```
 
-- **draw.py**
+- **draw.py**: default CLUSTERS = 3, FILENAME = 'data.txt'
 ```console
-usage: draw.py [-h] -c CLUSTERS -f FILENAME
+usage: draw.py [-h] [-c CLUSTERS] [-f FILENAME]
 
-Draw the scatterplots before and after K-means Clustering.
+Draw the scatterplots before and after K-Means Clustering.
 
 optional arguments:
   -h, --help                        show this help message and exit
-  -c CLUSTERS, --clusters CLUSTERS  number of clusters
+  -c CLUSTERS, --clusters CLUSTERS  classify the data into <CLUSTERS> groups
   -f FILENAME, --filename FILENAME  <FILENAME> from the inputs directory
 ```
 
@@ -43,19 +42,21 @@ Install Python required packages and generate the executable file **kmeans**.
 $ pip3 install -r requirements.txt; make 
 ```
 
-Randomly generate 2d coordinates and store in the inputs directory.
+Randomly generate 2d coordinates and store them into the inputs directory.
 ```bash
 $ python3 generate.py [-n NUMS] [-m MAXIMUM] [-f FILENAME]
 ```
 
-Do K-means Clustering.
+Do K-Means Clustering.
 ```bash
-$ ./kmeans [-h] [-n N] -f FILENAME -c M
+$ ./kmeans [-c CLUSTERS] [-f FILENAME]
 ```
 
-Draw the scatterplots before and after K-means Clustering if you would like to see the result.
+Draw the scatterplots before and after K-Means Clustering if you would like to see the result.
 ```bash
-$ python3 draw.py -c CLUSTERS -f FILENAME
+$ python3 draw.py [-c CLUSTERS] [-f FILENAME]
 ```
 
 ## References
+- [Exploring K-Means in Python, C++ and CUDA](www.goldsborough.me/c++/python/cuda/2017/09/10/20-32-46-exploring_k-means_in_python,_c++_and_cuda/)
+- [Implementing k-means clustering from scratch in C++](https://reasonabledeviations.com/2019/10/02/k-means-in-cpp/)
