@@ -1,15 +1,16 @@
-CXX = g++
-CFLAGS = -std=c++17 -g -Wall -O3 -fopenmp
+CXX = mpicxx
+CFLAGS = -std=c++17 -Wall -O3 -fopenmp
 
 PROGS = kmeans
+OBJS = kmeans.o main.o
 
 all: $(PROGS)
 
-kmeans: kmeans.o main.cpp
+kmeans: $(OBJS)
 	$(CXX) $(CFLAGS) $^ -o $@
 
-%.o:%.cpp %.h
-	$(CXX) $(CFLAGS) -c $< -o $@
+%.o:%.cpp
+	$(CXX) $(CFLAGS) -c $^ -o $@
 
 clean:
-	rm $(PROGS) *.o
+	rm $(PROGS) $(OBJS)

@@ -1,3 +1,4 @@
+#include <mpi.h>
 #include <time.h>
 #include <math.h>
 #include <getopt.h>
@@ -5,13 +6,17 @@
 #include <algorithm>
 #include "kmeans.h"
 
+#define MASTER 0
+
 void usage(const char *progname) {
-    fprintf(stderr, "usage: %s [-h] [-c CLUSTERS] [-f FILENAME]\n", progname);
+    fprintf(stderr, "usage: %s [-h] [-c CLUSTERS] [-f FILENAME] [--] cmd\n", progname);
     fprintf(stderr, "\n");
     fprintf(stderr, "optional arguments:\n");
     fprintf(stderr, "  -h --help                  show this help message and exit\n");
     fprintf(stderr, "  -c --clusters <CLUSTERS>   classify the data into <CLUSTERS> groups\n");
     fprintf(stderr, "  -f --filename <FILENAME>   <FILENAME> in the inputs directory\n");
+    fprintf(stderr, "  --                         sperate the arguments for kmeans and for the command\n");
+    fprintf(stderr, "  cmd                        only \"serial\", \"omp\", and \"mpi\" are available\n");
 }
 
 int main(int argc, char *argv[]) {
@@ -23,7 +28,8 @@ int main(int argc, char *argv[]) {
     };
 
     int opt;
-    size_t clusters = 3;
+    unsigned int clusters = 3;
+    std::string command = "serial";
     std::string filename = "data.txt";
 
     while ((opt = getopt_long(argc, argv, "f:c:h", long_options, NULL)) != EOF) {
@@ -35,36 +41,59 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    if (optind < argc) {
+        command = std::string(argv[optind]);
+    }
+
+    int world_size, world_rank = 0;
+
+    if (command == "mpi") {
+        MPI_Init(NULL, NULL);
+        MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+        MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+    }
+
     DataFrame points;
     readfile(filename, points);
+    unsigned int *point_clusters = (unsigned int*) calloc(points.size(), sizeof(unsigned int));
 
-    double elapsed;
+    double elapsed_time;
     struct timespec starttime, endtime;
-    std::vector<double> elapsed_times;
 
-    for (int thread_nums = 1; thread_nums <= 8; thread_nums *= 2) {
-        if (thread_nums == 1) {
+    if (command == "serial") {
+        clock_gettime(CLOCK_MONOTONIC, &starttime);
+        kmeansSerial(points, clusters, point_clusters);
+        clock_gettime(CLOCK_MONOTONIC, &endtime);
+        elapsed_time = calculate_time(starttime, endtime);
+    } else if (command == "omp") {
+        clock_gettime(CLOCK_MONOTONIC, &starttime);
+        kmeansOMP(points, clusters, point_clusters);
+        clock_gettime(CLOCK_MONOTONIC, &endtime);
+        elapsed_time = calculate_time(starttime, endtime);
+    } else if (command == "mpi") {
+        if (world_rank == MASTER) {
             clock_gettime(CLOCK_MONOTONIC, &starttime);
-            kmeansSerial(points, clusters);
-            clock_gettime(CLOCK_MONOTONIC, &endtime);
-        } else {
-            clock_gettime(CLOCK_MONOTONIC, &starttime);
-            kmeansThread(points, clusters, thread_nums);
-            clock_gettime(CLOCK_MONOTONIC, &endtime);
         }
 
-        elapsed = endtime.tv_sec - starttime.tv_sec;
-        elapsed += (endtime.tv_nsec - starttime.tv_nsec) / 1000000000.0;
-        elapsed_times.push_back(elapsed);
+        kmeansMPI(points, clusters, point_clusters);
+
+        if (world_rank == MASTER) {
+            clock_gettime(CLOCK_MONOTONIC, &endtime);
+            elapsed_time = calculate_time(starttime, endtime);
+        }
+    } else {
+        fprintf(stderr, "command \"%s\" is not available.\n", command.c_str());
+        exit(1);
     }
 
-    for (long unsigned int i = 0; i < elapsed_times.size(); i++) {
-        int thread_nums = (int) pow(2, i);
-        double ratio = std::min(elapsed_times[0] / elapsed_times[i], (double) thread_nums);
-        printf("Total elapsed time with %d thread(s): %7.3fs (%2.1fX)\n", thread_nums, elapsed_times[i], ratio);
+    if (world_rank == MASTER) {
+        printf("Total elapsed time with \"%s\" command: %.6fs\n", command.c_str(), elapsed_time);
+        writefile(filename + ".out", points, point_clusters);
     }
 
-    writefile(filename + ".out", points);
+    if (command == "mpi") {
+        MPI_Finalize();
+    }
 
     return 0;
 }
