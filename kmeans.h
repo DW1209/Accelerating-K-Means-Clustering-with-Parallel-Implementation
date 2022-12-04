@@ -22,8 +22,8 @@ struct Point {
     }
 };
 
-void readfile(std::string filename, DataFrame &points);
-void writefile(std::string filename, DataFrame &points, unsigned int *point_clusters);
+int readfile(std::string filename, DataFrame &points);
+int writefile(std::string filename, DataFrame &points, unsigned int *point_clusters);
 double calculate_time(const struct timespec &starttime, const struct timespec &endtime);
 void point_sum(Point *in_point, Point *in_out_point, int *length, MPI_Datatype *dtype);
 long double square(double value);

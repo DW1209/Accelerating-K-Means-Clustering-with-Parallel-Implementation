@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     }
 
     DataFrame points;
-    readfile(filename, points);
+    if (readfile(filename, points) == -1) exit(1);
     unsigned int *point_clusters = (unsigned int*) calloc(points.size(), sizeof(unsigned int));
 
     double elapsed_time;
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
 
     if (world_rank == MASTER) {
         printf("Total elapsed time with \"%s\" command: %.6fs\n", command.c_str(), elapsed_time);
-        writefile(filename + ".out", points, point_clusters);
+        if (writefile(filename + ".out", points, point_clusters) == -1) exit(1);
     }
 
     if (command == "mpi") {

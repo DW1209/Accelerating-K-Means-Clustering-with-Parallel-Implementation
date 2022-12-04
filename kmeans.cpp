@@ -1,6 +1,7 @@
 #include <omp.h>
 #include <mpi.h>
 #include <random>
+#include <errno.h>
 #include <iomanip>
 #include <fstream>
 #include <filesystem>
@@ -12,7 +13,7 @@
 #define MODE        0775
 #define DataFrame   std::vector<Point>
 
-void readfile(std::string filename, DataFrame &points) {
+int readfile(std::string filename, DataFrame &points) {
     std::filesystem::path dir("inputs");
     std::filesystem::path file(filename);
     std::filesystem::path pathname = dir / file;
@@ -29,12 +30,17 @@ void readfile(std::string filename, DataFrame &points) {
         }
 
         fp.close();
+    } else {
+        perror("readfile error");
+        return -1;
     }
 
     points.pop_back();
+
+    return 0;
 }
 
-void writefile(std::string filename, DataFrame &points, unsigned int *point_clusters) {
+int writefile(std::string filename, DataFrame &points, unsigned int *point_clusters) {
     std::filesystem::path dir("outputs");
     std::filesystem::path file(filename);
     std::filesystem::path pathname = dir / file;
@@ -52,7 +58,12 @@ void writefile(std::string filename, DataFrame &points, unsigned int *point_clus
         }
 
         fp.close();
+    } else {
+        perror("writefile error");
+        return -1;
     }
+
+    return 0;
 }
 
 double calculate_time(const struct timespec &starttime, const struct timespec &endtime) {
