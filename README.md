@@ -16,12 +16,14 @@ optional arguments:
 
 - **kmeans**: default CLUSTERS = 3, FILENAME = 'data.txt'
 ```console
-usage: ./kmeans [-h] [-c CLUSTERS] [-f FILENAME]
+usage: ./kmeans [-h] [-c CLUSTERS] [-f FILENAME] [--] cmd
 
 optional arguments:
   -h --help                     show this help message and exit
   -c --clusters <CLUSTERS>      classify the data into <CLUSTERS> groups
   -f --filename <FILENAME>      <FILENAME> in the inputs directory
+  --                            sperate the arguments for kmeans and for the command
+  cmd                           only "serial", "omp", and "mpi" are available
 ```
 
 - **draw.py**: default CLUSTERS = 3, FILENAME = 'data.txt'
@@ -49,7 +51,7 @@ $ python3 generate.py [-n NUMS] [-m MAXIMUM] [-f FILENAME]
 
 Do K-Means Clustering.
 ```bash
-$ ./kmeans [-c CLUSTERS] [-f FILENAME]
+$ ./kmeans [-c CLUSTERS] [-f FILENAME] [--] cmd
 ```
 
 Draw the scatterplots before and after K-Means Clustering if you would like to see the result.
