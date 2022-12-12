@@ -6,7 +6,8 @@
 #include <algorithm>
 #include "kmeans.h"
 
-#define MASTER 0
+#define MASTER      0
+#define DataFrame   std::vector<Point>
 
 void usage(const char *progname) {
     fprintf(stderr, "usage: %s [-h] [-c CLUSTERS] [-f FILENAME] [--] cmd\n", progname);
@@ -28,8 +29,8 @@ int main(int argc, char *argv[]) {
     };
 
     int opt;
+    std::string command;
     unsigned int clusters = 3;
-    std::string command = "serial";
     std::string filename = "data.txt";
 
     while ((opt = getopt_long(argc, argv, "f:c:h", long_options, NULL)) != EOF) {
@@ -46,6 +47,21 @@ int main(int argc, char *argv[]) {
     }
 
     int world_size, world_rank = 0;
+    DataFrame (*kmeans)(const DataFrame&, unsigned int, unsigned int*);
+
+    if (command == "serial") {
+        kmeans = &kmeansSerial;
+    } else if (command == "omp") {
+        kmeans = &kmeansOMP;
+    } else if (command == "mpi") {
+        kmeans = &kmeansMPI;
+    } else if (command == "") {
+        fprintf(stderr, "no command given.\n");
+        exit(1);
+    } else {
+        fprintf(stderr, "command \"%s\" is not available.\n", command.c_str());
+        exit(1);
+    }
 
     if (command == "mpi") {
         MPI_Init(NULL, NULL);
@@ -60,30 +76,15 @@ int main(int argc, char *argv[]) {
     double elapsed_time;
     struct timespec starttime, endtime;
 
-    if (command == "serial") {
+    if (world_rank == MASTER) {
         clock_gettime(CLOCK_MONOTONIC, &starttime);
-        kmeansSerial(points, clusters, point_clusters);
+    }
+
+    kmeans(points, clusters, point_clusters);
+
+    if (world_rank == MASTER) {
         clock_gettime(CLOCK_MONOTONIC, &endtime);
         elapsed_time = calculate_time(starttime, endtime);
-    } else if (command == "omp") {
-        clock_gettime(CLOCK_MONOTONIC, &starttime);
-        kmeansOMP(points, clusters, point_clusters);
-        clock_gettime(CLOCK_MONOTONIC, &endtime);
-        elapsed_time = calculate_time(starttime, endtime);
-    } else if (command == "mpi") {
-        if (world_rank == MASTER) {
-            clock_gettime(CLOCK_MONOTONIC, &starttime);
-        }
-
-        kmeansMPI(points, clusters, point_clusters);
-
-        if (world_rank == MASTER) {
-            clock_gettime(CLOCK_MONOTONIC, &endtime);
-            elapsed_time = calculate_time(starttime, endtime);
-        }
-    } else {
-        fprintf(stderr, "command \"%s\" is not available.\n", command.c_str());
-        exit(1);
     }
 
     if (world_rank == MASTER) {
