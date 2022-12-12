@@ -1,4 +1,4 @@
-# K-Means Clustering using OpenMP
+# K-Means Clustering Based on OpenMP and MPI
 
 ## Description
 - **generate.py**: default NUMS = 10000, MAXIMUM = 1000000, FILENAME = 'data.txt' 
