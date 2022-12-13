@@ -14,14 +14,15 @@ optional arguments:
   -f FILENAME, --filename FILENAME  store the data in the inputs directory and named <FILENAME>
 ```
 
-- **kmeans**: default CLUSTERS = 3, FILENAME = 'data.txt'
+- **kmeans**: default CLUSTERS = 3, FILENAME = 'data.txt', THREADS = 4
 ```console
-usage: ./kmeans [-h] [-c CLUSTERS] [-f FILENAME] [--] cmd
+usage: ./kmeans [-h] [-c CLUSTERS] [-f FILENAME] [-t THREADS] [--] cmd
 
 optional arguments:
   -h --help                     show this help message and exit
   -c --clusters <CLUSTERS>      classify the data into <CLUSTERS> groups
   -f --filename <FILENAME>      <FILENAME> in the inputs directory
+  -t --threads  <THREADS>       specify the number of omp threads, default 4
   --                            sperate the arguments for kmeans and for the command
   cmd                           only "serial", "omp", and "mpi" are available
 ```
@@ -51,7 +52,7 @@ $ python3 generate.py [-n NUMS] [-m MAXIMUM] [-f FILENAME]
 
 Do K-Means Clustering.
 ```bash
-$ ./kmeans [-c CLUSTERS] [-f FILENAME] [--] cmd
+$ ./kmeans [-c CLUSTERS] [-f FILENAME] [-t THREADS] [--] cmd
 ```
 
 Draw the scatterplots before and after K-Means Clustering if you would like to see the result.
