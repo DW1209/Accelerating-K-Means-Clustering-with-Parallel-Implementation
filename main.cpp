@@ -60,6 +60,8 @@ int main(int argc, char *argv[]) {
         kmeans = &kmeansOMP;
     } else if (command == "mpi") {
         kmeans = &kmeansMPI;
+    } else if (command == "hybrid") {
+        kmeans = &kmeansHybrid;
     } else if (command == "") {
         fprintf(stderr, "no command given.\n");
         exit(1);
@@ -68,13 +70,13 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    if (command == "mpi") {
+    if (command == "mpi" || command == "hybrid") {
         MPI_Init(NULL, NULL);
         MPI_Comm_size(MPI_COMM_WORLD, &world_size);
         MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
     }
 
-    if (command == "omp") {
+    if (command == "omp" || command == "hybrid") {
         threads = std::min(threads, omp_get_max_threads());
         omp_set_num_threads(threads);
     }

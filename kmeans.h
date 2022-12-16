@@ -31,5 +31,7 @@ long double squared_euclidean_distance(const Point &first, const Point &second);
 DataFrame kmeansSerial(const DataFrame &data, unsigned int k, unsigned int *point_clusters);
 DataFrame kmeansOMP(const DataFrame &data, unsigned int k, unsigned int *point_clusters);
 DataFrame kmeansMPI(const DataFrame &data, unsigned int k, unsigned int *point_clusters);
+DataFrame kmeansHybrid(const DataFrame &data, unsigned int k, unsigned int *point_clusters);
+DataFrame kmeansHybridFull(const DataFrame &data, unsigned int k, unsigned int *point_clusters);
 
 #endif
