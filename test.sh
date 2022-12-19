@@ -12,6 +12,14 @@ RESULT="result"
 OUTFILE="data.txt"
 HOSTFILE="hosts"
 
+#==== change default values from arguments ====#
+while getopts "c:f:" argv; do
+    case $argv in
+        c) CLUSTERS=$OPTARG                 ;;
+        f) INFILE=$OPTARG  ; OUTFILE=$OPTARG;;
+    esac
+done
+
 #==== these lines should be executed before parallel-scp ====#
 # generate points
 #python3 generate.py -n $NUMS -m $MAXIMUM -f $INFILE
@@ -24,9 +32,10 @@ for COMMAND in $COMMANDS
 do 
     if [ "$COMMAND" = "mpi" ] || [ "$COMMAND" = "hybrid" ]
     then
-        mpirun -quiet -np 4 --hostfile $HOSTFILE ./kmeans -c $CLUSTERS -f $INFILE $COMMAND | tee -a $RESULT
+        mpirun --quiet -np 4 --hostfile $HOSTFILE --bind-to core:overload-allowed\
+        ./kmeans -c $CLUSTERS -f $INFILE --no-output $COMMAND | tee -a $RESULT
     else
-        ./kmeans -c $CLUSTERS -f $INFILE $COMMAND | tee -a $RESULT
+        ./kmeans -c $CLUSTERS -f $INFILE --no-output $COMMAND | tee -a $RESULT
     fi
 done
 
@@ -37,9 +46,9 @@ done
 echo
 echo "K-Means clustering statistics"
 echo
-echo "========================="
+echo "==========================="
 awk '\
-    BEGIN {printf "implementation\ttime(s)\n"; printf "--------------\t---------\n"}\
+    BEGIN {printf "implementation\ttime(s)\n"; printf "--------------\t-----------\n"}\
     /Total/ { printf "%s\t%s\n", $5, $7 }' $RESULT\
     | column -t
-echo "========================="
+echo "==========================="
