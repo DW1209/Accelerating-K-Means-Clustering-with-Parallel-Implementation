@@ -15,6 +15,7 @@ void usage(const char *progname) {
     fprintf(stderr, "\n");
     fprintf(stderr, "optional arguments:\n");
     fprintf(stderr, "  -h --help                  show this help message and exit\n");
+    fprintf(stderr, "  -n --no-output             an argument to control writing the results into a file or not\n");
     fprintf(stderr, "  -c --clusters <CLUSTERS>   classify the data into <CLUSTERS> groups\n");
     fprintf(stderr, "  -f --filename <FILENAME>   <FILENAME> in the inputs directory\n");
     fprintf(stderr, "  -t --threads  <THREADS>    specify the number of omp threads, default 4\n");
@@ -25,6 +26,7 @@ void usage(const char *progname) {
 int main(int argc, char *argv[]) {
     static struct option long_options[] = {
         {"help"      , no_argument      , NULL, 'h'},
+        {"no-output" , no_argument      , NULL, 'n'},
         {"clusters"  , optional_argument, NULL, 'c'},
         {"filename"  , optional_argument, NULL, 'f'},
         {"threads"   , optional_argument, NULL, 't'},
@@ -32,16 +34,18 @@ int main(int argc, char *argv[]) {
     };
 
     int opt;
-    std::string command;
     int threads = 4;
+    bool output = true;
+    std::string command;
     unsigned int clusters = 3;
     std::string filename = "data.txt";
 
-    while ((opt = getopt_long(argc, argv, "f:c:t:h", long_options, NULL)) != EOF) {
+    while ((opt = getopt_long(argc, argv, "f:c:t:nh", long_options, NULL)) != EOF) {
         switch (opt) {
             case 'c': clusters = strtol(optarg, NULL, 10); break;
             case 'f': filename = std::string(optarg);      break;
             case 't': threads  = std::stoi(optarg);        break;
+            case 'n': output = false;                      break;
             case 'h': usage(argv[0]); exit(1);
             default : usage(argv[0]); exit(1);
         }
@@ -101,7 +105,9 @@ int main(int argc, char *argv[]) {
 
     if (world_rank == MASTER) {
         printf("Total elapsed time with \"%s\" command: %.6fs\n", command.c_str(), elapsed_time);
-        if (writefile(filename + ".out", points, point_clusters) == -1) exit(1);
+        if (output) {
+            if (writefile(filename + ".out", points, point_clusters) == -1) exit(1);
+        }
     }
 
     if (command == "mpi") {
