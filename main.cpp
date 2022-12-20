@@ -86,11 +86,16 @@ int main(int argc, char *argv[]) {
     }
 
     DataFrame points;
-    if (readfile(filename, points) == -1) exit(1);
-    unsigned int *point_clusters = (unsigned int*) calloc(points.size(), sizeof(unsigned int));
+    if (readfile(filename, points) == -1) {
+        if (command == "mpi" || command == "hybrid") {
+            MPI_Finalize();
+        }
+        exit(1);
+    }
 
     double elapsed_time;
     struct timespec starttime, endtime;
+    unsigned int *point_clusters = (unsigned int*) calloc(points.size(), sizeof(unsigned int));
 
     if (world_rank == MASTER) {
         clock_gettime(CLOCK_MONOTONIC, &starttime);
@@ -106,7 +111,12 @@ int main(int argc, char *argv[]) {
     if (world_rank == MASTER) {
         printf("Total elapsed time with \"%s\" command: %.6fs\n", command.c_str(), elapsed_time);
         if (output) {
-            if (writefile(filename + ".out", points, point_clusters) == -1) exit(1);
+            if (writefile(filename + ".out", points, point_clusters) == -1) {
+                if (command == "mpi" || command == "hybrid") {
+                    MPI_Finalize();
+                }
+                exit(1);
+            }
         }
     }
 
