@@ -9,14 +9,13 @@ INFILE="data.txt"
 CLUSTERS=3
 COMMANDS="serial omp mpi hybrid"
 RESULT="result"
-OUTFILE="data.txt"
 HOSTFILE="hosts"
 
 #==== change default values from arguments ====#
 while getopts "c:f:" argv; do
     case $argv in
-        c) CLUSTERS=$OPTARG                 ;;
-        f) INFILE=$OPTARG  ; OUTFILE=$OPTARG;;
+        c) CLUSTERS=$OPTARG ;;
+        f) INFILE=$OPTARG   ;;
     esac
 done
 
@@ -32,7 +31,7 @@ for COMMAND in $COMMANDS
 do 
     if [ "$COMMAND" = "mpi" ] || [ "$COMMAND" = "hybrid" ]
     then
-        mpirun --quiet -np 4 --hostfile $HOSTFILE --bind-to core:overload-allowed\
+        mpirun -np 4 -x OMP_NUM_THREADS=4 --hostfile $HOSTFILE --bind-to core\
         ./kmeans -c $CLUSTERS -f $INFILE --no-output $COMMAND | tee -a $RESULT
     else
         ./kmeans -c $CLUSTERS -f $INFILE --no-output $COMMAND | tee -a $RESULT
@@ -40,7 +39,7 @@ do
 done
 
 # draw kmeans result (uncomment it if needed)
-#python3 draw.py -c $CLUSTERS -f $OUTFILE
+#python3 draw.py -c $CLUSTERS -f $INFILE
 
 # output result
 echo

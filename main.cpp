@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (command == "mpi") {
+    if (command == "mpi" || command == "hybrid") {
         MPI_Finalize();
     }
 
