@@ -74,8 +74,15 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    if (command == "mpi" || command == "hybrid") {
+    if (command == "mpi") {
         MPI_Init(NULL, NULL);
+        MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+        MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+    }
+
+    if (command == "hybrid") {
+        int provided;
+        MPI_Init_thread(NULL, NULL, MPI_THREAD_MULTIPLE, &provided);
         MPI_Comm_size(MPI_COMM_WORLD, &world_size);
         MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
     }
@@ -109,7 +116,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (world_rank == MASTER) {
-        printf("Total elapsed time with \"%s\" command: %.6fs\n", command.c_str(), elapsed_time);
+        printf("Total elapsed time with \"%s\" command: %.6f secs\n", command.c_str(), elapsed_time);
         if (output) {
             if (writefile(filename + ".out", points, point_clusters) == -1) {
                 if (command == "mpi" || command == "hybrid") {
