@@ -25,7 +25,7 @@ done
 # exeucute program
 #make clean && make
 
-#==== statistic====#
+#==== statistic ====#
 > $RESULT
 for COMMAND in $COMMANDS
 do 
@@ -41,13 +41,17 @@ done
 # draw kmeans result (uncomment it if needed)
 #python3 draw.py -c $CLUSTERS -f $INFILE
 
-# output result
+#==== output result ====#
 echo
 echo "K-Means clustering statistics"
 echo
-echo "==========================="
-awk '\
-    BEGIN {printf "implementation\ttime(s)\n"; printf "--------------\t-----------\n"}\
-    /Total/ { printf "%s\t%s\n", $5, $7 }' $RESULT\
-    | column -t
-echo "==========================="
+echo "======================================"
+awk -v BASETIME=$(awk 'NR==1{print $7}' $RESULT)\
+    '\
+    BEGIN {printf "implementation\ttime(s)\tspeedup\n";\
+    printf "--------------\t-----------\t---------\n"}\
+    /Total/ { printf "%s\t%ss\t%.3fX\n", $5, $7, BASETIME / $7 }\
+    '\
+    $RESULT | column -t
+echo "======================================"
+echo
