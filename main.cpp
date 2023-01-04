@@ -20,7 +20,7 @@ void usage(const char *progname) {
     fprintf(stderr, "  -f --filename <FILENAME>   <FILENAME> in the inputs directory\n");
     fprintf(stderr, "  -t --threads  <THREADS>    specify the number of omp threads, default 4\n");
     fprintf(stderr, "  --                         sperate the arguments for kmeans and for the command\n");
-    fprintf(stderr, "  cmd                        only \"serial\", \"omp\", and \"mpi\" are available\n");
+    fprintf(stderr, "  cmd                        only \"serial\", \"omp\", \"mpi\", and \"hybrid\" are available\n");
 }
 
 int main(int argc, char *argv[]) {

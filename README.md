@@ -24,7 +24,7 @@ optional arguments:
   -f --filename <FILENAME>      <FILENAME> in the inputs directory
   -t --threads  <THREADS>       specify the number of omp threads, default 4
   --                            sperate the arguments for kmeans and for the command
-  cmd                           only "serial", "omp", and "mpi" are available
+  cmd                           only "serial", "omp", "mpi", and "hybrid" are available
 ```
 
 - **draw.py**: default CLUSTERS = 3, FILENAME = 'data.txt'
