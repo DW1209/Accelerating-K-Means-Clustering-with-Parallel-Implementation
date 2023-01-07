@@ -29,9 +29,12 @@ done
 > $RESULT
 for COMMAND in $COMMANDS
 do 
-    if [ "$COMMAND" = "mpi" ] || [ "$COMMAND" = "hybrid" ]
-    then
+    if [ "$COMMAND" = "mpi" ]; then
         mpirun -np 4 -x OMP_NUM_THREADS=4 --hostfile $HOSTFILE --bind-to core\
+        ./kmeans -c $CLUSTERS -f $INFILE --no-output $COMMAND | tee -a $RESULT
+    elif [ "$COMMAND" = "hybrid" ]; then
+        export OMP_PROC_BIND=true; export OMP_NUM_THREADS=4;
+        mpirun -np 4 -pernode --hostfile $HOSTFILE --bind-to none \
         ./kmeans -c $CLUSTERS -f $INFILE --no-output $COMMAND | tee -a $RESULT
     else
         ./kmeans -c $CLUSTERS -f $INFILE --no-output $COMMAND | tee -a $RESULT
