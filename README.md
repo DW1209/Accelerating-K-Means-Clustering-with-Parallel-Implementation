@@ -60,6 +60,41 @@ Draw the scatterplots before and after K-Means Clustering if you would like to s
 $ python3 draw.py [-c CLUSTERS] [-f FILENAME]
 ```
 
+### Advance
+Example commandline for omp method.
+- `-c` cluster = 5
+- `-f` input filename = data.txt (default)
+- `-t` omp thread = 4 (default)
+- `--no-output` = true
+
+```bash
+./kmeans -c 5 --no-output omp
+```
+
+Example commandline for mpi method. 
+- `-np` total number of MPI processes = 4
+- `--hostfile` host filename
+- `--bind-to core`
+
+```bash
+mpirun -np 4 -x --hostfile <HOSTFILE> --bind-to core \
+./kmeans mpi
+```
+
+Example commandline for hybrid method.
+- `OMP_PROC_BIND` support binding of threads
+- `OMP_NUM_THREADS` specify the number of omp threads = 4
+- `-np` total number of MPI processes = 4
+- `-pernode` one process per node
+- `--hostfile` host filename (should have at least 4 hosts)
+- `--bind-to none`
+
+```bash
+export OMP_PROC_BIND=true; export OMP_NUM_THREADS=4;
+mpirun -np 4 -pernode --hostfile <HOSTFILE> --bind-to none \
+./kmeans --no-output hybrid
+```
+
 ## References
 - [Exploring K-Means in Python, C++ and CUDA](www.goldsborough.me/c++/python/cuda/2017/09/10/20-32-46-exploring_k-means_in_python,_c++_and_cuda/)
 - [Implementing k-means clustering from scratch in C++](https://reasonabledeviations.com/2019/10/02/k-means-in-cpp/)
