@@ -1,4 +1,4 @@
-# K-Means Clustering Based on OpenMP, MPI, and Hybrid Methods
+# K-Means Clustering Based on OMP, MPI, and Hybrid Methods
 
 ## Description
 
