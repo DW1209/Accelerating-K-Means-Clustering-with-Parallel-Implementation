@@ -11,14 +11,15 @@
 #define DataFrame   std::vector<Point>
 
 void usage(const char *progname) {
-    fprintf(stderr, "usage: %s [-h] [-c CLUSTERS] [-f FILENAME] [-t THREADS] [--] cmd\n", progname);
+    fprintf(stderr, "usage: %s [-h] [-c CLUSTERS] [-f FILENAME] [-t THREADS] [-n] [--] cmd\n", progname);
     fprintf(stderr, "\n");
     fprintf(stderr, "optional arguments:\n");
     fprintf(stderr, "  -h --help                  show this help message and exit\n");
     fprintf(stderr, "  -n --no-output             an argument to control writing the results into a file or not\n");
     fprintf(stderr, "  -c --clusters <CLUSTERS>   classify the data into <CLUSTERS> groups\n");
     fprintf(stderr, "  -f --filename <FILENAME>   <FILENAME> in the inputs directory\n");
-    fprintf(stderr, "  -t --threads  <THREADS>    specify the number of omp threads, default 4\n");
+    fprintf(stderr, "  -t --threads  <THREADS>    specify the number of omp threads\n");
+    fprintf(stderr, "  -n --no-output             disable writing the final result to the outputs directory\n");
     fprintf(stderr, "  --                         sperate the arguments for kmeans and for the command\n");
     fprintf(stderr, "  cmd                        only \"serial\", \"omp\", \"mpi\", and \"hybrid\" are available\n");
 }
